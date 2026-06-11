@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>Maroc - Coupe du Monde 2026</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
@@ -300,7 +300,7 @@
             margin: 0;
         }
 
-        /* Footer fixe de la modale avec les boutons */
+        /* Footer fixe de la modale avec le bouton d'ajout seulement */
         .discussion-footer-fixed {
             background: rgba(11, 15, 25, 0.95);
             backdrop-filter: blur(10px);
@@ -309,15 +309,20 @@
             flex-shrink: 0;
         }
 
-        .discussion-footer-fixed .form-control {
-            background-color: rgba(0, 0, 0, 0.4) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: #ffffff !important;
+        .btn-add-comment {
+            background: linear-gradient(135deg, #006233, #008844);
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
-        .discussion-footer-fixed .form-control:focus {
-            border-color: #00ff87 !important;
-            box-shadow: 0 0 0 0.25rem rgba(0, 255, 135, 0.25) !important;
+        .btn-add-comment:active {
+            transform: scale(0.98);
         }
 
         .root-comment {
@@ -377,6 +382,16 @@
             border-radius: 16px !important;
             width: 95% !important;
             max-width: 500px !important;
+        }
+
+        /* Modale d'ajout de message dédiée */
+        .swal2-popup-message-form {
+            background: linear-gradient(135deg, #1a1f2e, #0b0f19) !important;
+            color: #f8f9fa !important;
+            border-radius: 24px !important;
+            width: 92% !important;
+            max-width: 450px !important;
+            padding: 20px !important;
         }
 
         .app-footer {
@@ -458,11 +473,10 @@
         const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9utojYkIxj1cI7Zvt3O89BoMGQy5zYe8wDVe_-Ph1lf6oOLciqpH0qwei1y9VuAtp/exec";
 
         // RÉSULTATS DES MATCHS - MODIFIABLES DIRECTEMENT ICI
-        // Format: { homeScore, awayScore }
         const matchResults = {
-            1: { homeScore: 0, awayScore: 0 },  // Brésil vs Maroc
-            2: { homeScore: 0, awayScore: 0 },  // Écosse vs Maroc
-            3: { homeScore: 0, awayScore: 0 }   // Maroc vs Haïti
+            1: { homeScore: 0, awayScore: 0 },
+            2: { homeScore: 0, awayScore: 0 },
+            3: { homeScore: 0, awayScore: 0 }
         };
 
         const matchesData = [
@@ -510,6 +524,7 @@
         let selectedParentId = "root"; 
         let estAdmin = false; 
         let currentMatchId = null;
+        let currentMatchData = null;
 
         function verifierEnregistrementUtilisateur() {
             const pseudoExistant = localStorage.getItem('supporter_pseudo');
@@ -550,28 +565,6 @@
             }
         }
 
-        function debloquerPseudo() {
-            const inputName = document.getElementById('swal-input-name-modal');
-            if (inputName) {
-                inputName.removeAttribute('disabled');
-                inputName.focus();
-            }
-        }
-
-        function formaterDateISO(dateISO) {
-            if (!dateISO) return "";
-            if (typeof dateISO === 'string' && dateISO.includes('/')) return dateISO;
-            
-            const dateObj = new Date(dateISO);
-            if (isNaN(dateObj.getTime())) return dateISO; 
-
-            const jj = String(dateObj.getDate()).padStart(2, '0');
-            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
-            const aaaa = dateObj.getFullYear();
-
-            return `${jj}/${mm}/${aaaa}`;
-        }
-
         function demanderConnexionAdmin() {
             Swal.fire({
                 title: '<span class="fs-6 text-white fw-bold">Espace Administration</span>',
@@ -605,6 +598,9 @@
                         showConfirmButton: false,
                         customClass: { popup: 'swal2-popup-dark' }
                     });
+                    if (currentMatchId) {
+                        openCommentsModal(currentMatchId);
+                    }
                 }
             });
         }
@@ -615,7 +611,6 @@
 
             matchesData.forEach(match => {
                 const result = matchResults[match.id] || { homeScore: 0, awayScore: 0 };
-                const resultText = `${result.homeScore} - ${result.awayScore}`;
                 
                 const card = document.createElement('div');
                 card.className = 'match-card';
@@ -741,15 +736,88 @@
             });
         }
 
-        // Fonction pour formater le message avec préservation des sauts de ligne
         function formatMessageWithLineBreaks(message) {
             if (!message) return '';
-            // Remplacer les retours à la ligne par des <br> et préserver le formatage
             return escapeHtml(message).replace(/\n/g, '<br>').replace(/\r/g, '');
+        }
+
+        // Ouvre la modale de saisie de message (indépendante)
+        async function openMessageFormModal(matchId, parentId, parentName) {
+            const pseudoSauvegarde = localStorage.getItem('supporter_pseudo') || '';
+            
+            const result = await Swal.fire({
+                title: '<i class="fa-regular fa-pen-to-square me-2 text-success"></i> Nouveau message',
+                html: `
+                    <div class="text-start">
+                        ${parentId !== "root" ? `<div class="alert alert-success bg-success text-white small p-2 mb-3" style="background:#006233 !important; border:none;">
+                            <i class="fa-solid fa-reply me-1"></i> En réponse à : <strong>${escapeHtml(parentName)}</strong>
+                        </div>` : ''}
+                        <label class="small mb-1 d-block text-start">Votre pseudo :</label>
+                        <input id="msg-pseudo" class="form-control form-control-sm mb-3" placeholder="Votre pseudo" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}">
+                        <label class="small mb-1 d-block text-start">Votre message :</label>
+                        <textarea id="msg-content" class="form-control" rows="4" placeholder="Écrivez votre message ici...&#10;Appuyez sur Entrée pour passer à la ligne"></textarea>
+                    </div>
+                `,
+                showCancelButton: true,
+                confirmButtonText: '<i class="fa-regular fa-paper-plane me-1"></i> Envoyer',
+                cancelButtonText: 'Annuler',
+                confirmButtonColor: '#006233',
+                cancelButtonColor: '#6c757d',
+                customClass: { popup: 'swal2-popup-message-form' },
+                preConfirm: () => {
+                    const pseudo = document.getElementById('msg-pseudo').value.trim();
+                    const message = document.getElementById('msg-content').value;
+                    if (!pseudo) {
+                        Swal.showValidationMessage('Veuillez entrer votre pseudo');
+                        return false;
+                    }
+                    if (!message.trim()) {
+                        Swal.showValidationMessage('Veuillez écrire un message');
+                        return false;
+                    }
+                    return { pseudo, message };
+                }
+            });
+
+            if (result.isConfirmed) {
+                localStorage.setItem('supporter_pseudo', result.value.pseudo);
+                
+                const loadingSend = Swal.fire({ title: '<div class="loading-text"><div class="loading-spinner"></div>Envoi du message...</div>', showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'swal2-popup-dark' } });
+
+                const commentId = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                const aujourdhui = new Date();
+                const jj = String(aujourdhui.getDate()).padStart(2, '0');
+                const mm = String(aujourdhui.getMonth() + 1).padStart(2, '0');
+                const aaaa = aujourdhui.getFullYear();
+                const dateFormatee = `${jj}/${mm}/${aaaa}`;
+
+                const urlParams = new URLSearchParams();
+                urlParams.append("action", "add");
+                urlParams.append("matchId", matchId);
+                urlParams.append("commentId", commentId);
+                urlParams.append("parentId", parentId);
+                urlParams.append("nom", result.value.pseudo);
+                urlParams.append("commentaire", result.value.message);
+                urlParams.append("date", dateFormatee);
+
+                try {
+                    await fetch(GOOGLE_SHEET_SCRIPT_URL, {
+                        method: "POST",
+                        body: urlParams
+                    });
+                    loadingSend.close();
+                    Swal.fire({ icon: 'success', title: 'Message envoyé!', timer: 1000, showConfirmButton: false, customClass: { popup: 'swal2-popup-dark' } });
+                    setTimeout(() => openCommentsModal(matchId), 1000);
+                } catch (err) {
+                    loadingSend.close();
+                    Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible d\'envoyer.', customClass: { popup: 'swal2-popup-dark' } });
+                }
+            }
         }
 
         async function openCommentsModal(matchId) {
             currentMatchId = matchId;
+            currentMatchData = matchesData.find(m => m.id === matchId);
             selectedParentId = "root";
             
             afficherChargementModale();
@@ -790,7 +858,7 @@
                                     </div>
                                     <div class="comment-message mt-1">${formattedMessage}</div>
                                     <div class="text-end mt-1">
-                                        <button class="btn-reply-link" onclick="setReplyTarget('${root.commentId}', '${safeRootNom}')">Répondre</button>
+                                        <button class="btn-reply-link" onclick="openMessageFormModal(${matchId}, '${root.commentId}', '${safeRootNom}')">Répondre</button>
                                     </div>
                                 </div>
                             </div>
@@ -835,10 +903,6 @@
                 `;
             }
 
-            const pseudoSauvegarde = localStorage.getItem('supporter_pseudo') || '';
-            const estVerrouille = pseudoSauvegarde !== '' ? 'disabled' : '';
-            const classeBoutonModif = pseudoSauvegarde !== '' ? '' : 'd-none';
-
             Swal.close();
 
             Swal.fire({
@@ -850,87 +914,20 @@
                     <div style="height:100%; display:flex; flex-direction:column;">
                         <div class="discussion-header-fixed">
                             <h3><i class="fa-regular fa-comments me-2 text-warning"></i>Espace de Discussion</h3>
-                            <p>Match ${matchesData.find(m => m.id === matchId)?.homeTeam} vs ${matchesData.find(m => m.id === matchId)?.awayTeam}</p>
+                            <p>${currentMatchData.homeTeam} vs ${currentMatchData.awayTeam}</p>
                         </div>
                         ${bulkActionBarHtml}
                         <div class="comment-container-fullscreen" id="comment-scroll-area">
                             ${treeHtml}
                         </div>
                         <div class="discussion-footer-fixed">
-                            <div id="reply-indicator-modal" class="badge bg-secondary mb-2 d-none" style="font-size:0.75rem;">
-                                En réponse à : <span id="reply-target-name-modal"></span> 
-                                <i class="fa-solid fa-xmark ms-2" style="cursor:pointer" onclick="resetReplyTargetModal()"></i>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center mb-1">
-                                <label for="swal-input-name-modal" class="small text-white-50">Votre Pseudo :</label>
-                                <button id="btn-modifier-pseudo-modal" class="btn btn-link p-0 text-info small ${classeBoutonModif}" style="font-size:0.75rem; text-decoration:none;" onclick="debloquerPseudo()">
-                                    <i class="fa-solid fa-pen-to-square me-1"></i>Changer
-                                </button>
-                            </div>
-                            <input id="swal-input-name-modal" class="form-control form-control-sm mb-2" placeholder="Ex: Ahmed" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}" ${estVerrouille}>
-                            <label for="swal-input-msg-modal" class="small mb-1 d-block text-white-50">Votre message :</label>
-                            <textarea id="swal-input-msg-modal" class="form-control form-control-sm" rows="3" placeholder="Votre texte ici...&#10;Appuyez sur Entrée pour aller à la ligne"></textarea>
-                            <div class="d-flex gap-2 mt-3">
-                                <button id="close-discussion-btn" class="btn btn-secondary flex-grow-1" style="background:#6c757d; border:none;">Fermer</button>
-                                <button id="send-discussion-btn" class="btn btn-success flex-grow-1" style="background:#006233; border:none;"><i class="fa-regular fa-paper-plane me-1"></i> Envoyer</button>
-                            </div>
+                            <button class="btn-add-comment" onclick="openMessageFormModal(${matchId}, 'root', null)">
+                                <i class="fa-regular fa-plus-circle me-2"></i> Ajouter un commentaire
+                            </button>
                         </div>
                     </div>
                 `,
                 didOpen: () => {
-                    const closeBtn = document.getElementById('close-discussion-btn');
-                    const sendBtn = document.getElementById('send-discussion-btn');
-                    
-                    if (closeBtn) {
-                        closeBtn.onclick = () => Swal.close();
-                    }
-                    
-                    if (sendBtn) {
-                        sendBtn.onclick = async () => {
-                            const nom = document.getElementById('swal-input-name-modal').value.trim();
-                            const commentaire = document.getElementById('swal-input-msg-modal').value;
-                            
-                            if (!nom || !whitespaceCheck(commentaire)) {
-                                Swal.fire({ icon: 'error', title: 'Champs vides', text: 'Veuillez remplir tous les champs.', customClass: { popup: 'swal2-popup-dark' }, timer: 1500, showConfirmButton: false });
-                                return;
-                            }
-
-                            localStorage.setItem('supporter_pseudo', nom);
-
-                            const loadingSend = Swal.fire({ title: '<div class="loading-text"><div class="loading-spinner"></div>Envoi du message...</div>', showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'swal2-popup-dark' } });
-
-                            const commentId = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-                            const aujourdhui = new Date();
-                            const jj = String(aujourdhui.getDate()).padStart(2, '0');
-                            const mm = String(aujourdhui.getMonth() + 1).padStart(2, '0');
-                            const aaaa = aujourdhui.getFullYear();
-                            const dateFormatee = `${jj}/${mm}/${aaaa}`;
-
-                            const urlParams = new URLSearchParams();
-                            urlParams.append("action", "add");
-                            urlParams.append("matchId", matchId);
-                            urlParams.append("commentId", commentId);
-                            urlParams.append("parentId", selectedParentId);
-                            urlParams.append("nom", nom);
-                            urlParams.append("commentaire", commentaire);
-                            urlParams.append("date", dateFormatee);
-
-                            try {
-                                await fetch(GOOGLE_SHEET_SCRIPT_URL, {
-                                    method: "POST",
-                                    body: urlParams
-                                });
-                                loadingSend.close();
-                                Swal.fire({ icon: 'success', title: 'Message envoyé!', timer: 1000, showConfirmButton: false, customClass: { popup: 'swal2-popup-dark' } });
-                                setTimeout(() => openCommentsModal(matchId), 1000);
-                            } catch (err) {
-                                loadingSend.close();
-                                Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible d\'envoyer.', customClass: { popup: 'swal2-popup-dark' } });
-                            }
-                        };
-                    }
-                    
-                    // Scroll automatique vers le bas pour voir les derniers messages
                     const scrollArea = document.getElementById('comment-scroll-area');
                     if (scrollArea) {
                         setTimeout(() => {
@@ -941,28 +938,18 @@
             });
         }
 
-        function setReplyTarget(id, name) {
-            selectedParentId = id;
-            const ind = document.getElementById('reply-indicator-modal');
-            const tgt = document.getElementById('reply-target-name-modal');
-            if(ind && tgt) {
-                tgt.innerText = name;
-                ind.classList.remove('d-none');
-                setTimeout(() => {
-                    const msgInput = document.getElementById('swal-input-msg-modal');
-                    if(msgInput) msgInput.focus();
-                }, 100);
-            }
-        }
+        function formaterDateISO(dateISO) {
+            if (!dateISO) return "";
+            if (typeof dateISO === 'string' && dateISO.includes('/')) return dateISO;
+            
+            const dateObj = new Date(dateISO);
+            if (isNaN(dateObj.getTime())) return dateISO; 
 
-        function resetReplyTargetModal() {
-            selectedParentId = "root";
-            const ind = document.getElementById('reply-indicator-modal');
-            if(ind) ind.classList.add('d-none');
-        }
+            const jj = String(dateObj.getDate()).padStart(2, '0');
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const aaaa = dateObj.getFullYear();
 
-        function whitespaceCheck(str) {
-            return str.replace(/\s/g, '').length > 0;
+            return `${jj}/${mm}/${aaaa}`;
         }
 
         function escapeHtml(t) {
