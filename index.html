@@ -10,6 +10,10 @@
     
     <style>
         /* Thème Premium Dark */
+        * {
+            box-sizing: border-box;
+        }
+
         body {
             background-color: #0b0f19;
             color: #f8f9fa;
@@ -116,6 +120,7 @@
             align-items: center;
             justify-content: center;
             width: 35%;
+            position: relative;
         }
 
         .flag-img {
@@ -133,6 +138,18 @@
             font-size: 0.9rem;
             text-align: center;
             color: #ffffff;
+            margin-bottom: 5px;
+        }
+
+        .match-result {
+            font-size: 0.85rem;
+            font-weight: bold;
+            color: #00ff87;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 2px 8px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 4px;
         }
 
         .vs-box {
@@ -154,9 +171,9 @@
         }
 
         .countdown-timer {
-            font-size: 0.75rem;
-            margin-top: 8px;
-            color: #00ff87;
+            font-size: 0.7rem;
+            margin-top: 6px;
+            color: #ffaa44;
             font-family: monospace;
             font-weight: 600;
         }
@@ -186,6 +203,32 @@
             border: none;
         }
 
+        /* Indicateur de chargement */
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #00ff87;
+            animation: spin 0.8s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #00ff87;
+            font-weight: 600;
+            padding: 20px;
+        }
+
         /* ---------------------------------------------------- */
         /* STRUCTURE DE L'ESPACE DISCUSSION PLEIN ÉCRAN FIGÉ    */
         /* ---------------------------------------------------- */
@@ -193,44 +236,78 @@
         .swal2-popup-fullscreen-maroc {
             background: linear-gradient(135deg, #8b0000 0%, #052e16 100%) !important;
             color: #f8f9fa !important;
-            padding: 15px !important;
-            height: 100vh !important; /* Force la hauteur totale de l'écran */
+            padding: 0 !important;
+            height: 100vh !important;
+            width: 100vw !important;
             max-width: none !important;
             border-radius: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
         }
 
-        /* Supprime les marges par défaut de Swal pour maîtriser le flex */
         .swal2-popup-fullscreen-maroc .swal2-html-container {
             margin: 0 !important;
             padding: 0 !important;
-            height: 100% !important;
+            flex: 1 !important;
             display: flex !important;
             flex-direction: column !important;
-            overflow: hidden !important; /* Empêche le popup global de scroller */
+            overflow: hidden !important;
+            height: 100% !important;
+        }
+
+        /* Header fixe de la modale */
+        .discussion-header-fixed {
+            background: linear-gradient(135deg, #8b0000 0%, #111827 100%);
+            padding: 15px 20px;
+            border-bottom: 3px solid #00ff87;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .discussion-header-fixed h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 1px;
+        }
+
+        .discussion-header-fixed p {
+            margin: 5px 0 0;
+            font-size: 0.8rem;
+            color: #00ff87;
         }
 
         /* Zone de la liste des messages : Seule zone autorisée à scroller */
         .comment-container-fullscreen {
-            flex-grow: 1; 
-            overflow-y: auto; /* Scrolle uniquement ici */
+            flex: 1;
+            overflow-y: auto;
             -webkit-overflow-scrolling: touch;
-            background: rgba(0, 0, 0, 0.5) !important; 
+            background: rgba(0, 0, 0, 0.5) !important;
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
-            border-radius: 12px;
             padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 0;
         }
 
-        /* Zone d'envoi en bas : FICHÉE, ne bouge jamais */
-        .discussion-footer-form {
-            background: rgba(11, 15, 25, 0.8);
+        /* Footer fixe de la modale avec les boutons */
+        .discussion-footer-fixed {
+            background: rgba(11, 15, 25, 0.95);
             backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 12px;
-            margin-bottom: 10px;
+            border-top: 2px solid rgba(0, 255, 135, 0.3);
+            padding: 15px 20px;
+            flex-shrink: 0;
+        }
+
+        .discussion-footer-fixed .form-control {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+        }
+
+        .discussion-footer-fixed .form-control:focus {
+            border-color: #00ff87 !important;
+            box-shadow: 0 0 0 0.25rem rgba(0, 255, 135, 0.25) !important;
         }
 
         .root-comment {
@@ -268,21 +345,11 @@
         }
 
         .admin-bulk-bar {
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(0, 0, 0, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 10px 12px;
             margin-bottom: 12px;
-        }
-
-        .swal2-popup-fullscreen-maroc .form-control {
-            background-color: rgba(0, 0, 0, 0.4) !important;
-            border: 1px solid rgba(255, 255, 255, 0.15) !important;
-            color: #ffffff !important;
-        }
-        .swal2-popup-fullscreen-maroc .form-control:focus {
-            border-color: #00ff87 !important;
-            box-shadow: 0 0 0 0.25rem rgba(0, 255, 135, 0.25) !important;
         }
 
         /* Style Popups classiques */
@@ -293,11 +360,6 @@
             border-radius: 16px !important;
             width: 95% !important;
             max-width: 500px !important;
-        }
-
-        .swal2-html-container label {
-            color: #e2e8f0 !important;
-            font-weight: 500;
         }
 
         .app-footer {
@@ -322,10 +384,10 @@
             <div class="header-logo mb-1">
                 <img src="https://flagcdn.com/w80/ma.png" alt="Maroc">
             </div>
-            <h1 class="h5 mb-0 fw-bold text-white text-uppercase tracking-wide" style="font-size: 1.1rem; letter-spacing: 0.5px;">
+            <h1 class="h5 mb-0 fw-bold text-white text-uppercase" style="font-size: 1.2rem; letter-spacing: 0.5px; color: #ffffff !important; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);">
                 Lions de l'Atlas
             </h1>
-            <p class="text-muted small mb-0" style="font-size: 0.72rem; opacity: 0.85;">
+            <p class="text-white-50 small mb-0" style="font-size: 0.75rem; opacity: 0.95; color: #e0e0e0 !important;">
                 Coupe du Monde FIFA 2026 — Groupe C
             </p>
             <div id="admin-zone">
@@ -343,8 +405,8 @@
     </div>
 
     <main class="container px-3">
-        <h2 class="h6 text-uppercase text-muted fw-bold mb-3 px-1">
-            <i class="fa-solid fa-calendar-days me-1 text-danger"></i> Calendrier de la phase de groupes
+        <h2 class="h6 text-uppercase fw-bold mb-3 px-1" style="color: #00ff87 !important; text-shadow: 0 0 8px rgba(0,255,135,0.3);">
+            <i class="fa-solid fa-calendar-days me-1" style="color: #ff4444;"></i> Calendrier de la phase de groupes
         </h2>
         <div id="matches-container"></div>
     </main>
@@ -358,6 +420,14 @@
 
     <script>
         const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9utojYkIxj1cI7Zvt3O89BoMGQy5zYe8wDVe_-Ph1lf6oOLciqpH0qwei1y9VuAtp/exec";
+
+        // RÉSULTATS DES MATCHS - MODIFIABLES DIRECTEMENT ICI
+        // Format: { homeScore, awayScore }
+        const matchResults = {
+            1: { homeScore: 0, awayScore: 0 },  // Brésil vs Maroc
+            2: { homeScore: 0, awayScore: 0 },  // Écosse vs Maroc
+            3: { homeScore: 0, awayScore: 0 }   // Maroc vs Haïti
+        };
 
         const matchesData = [
             {
@@ -403,6 +473,7 @@
 
         let selectedParentId = "root"; 
         let estAdmin = false; 
+        let currentMatchId = null;
 
         function verifierEnregistrementUtilisateur() {
             const pseudoExistant = localStorage.getItem('supporter_pseudo');
@@ -444,12 +515,10 @@
         }
 
         function debloquerPseudo() {
-            const inputName = document.getElementById('swal-input-name');
-            const btnModif = document.getElementById('btn-modifier-pseudo');
-            if (inputName && btnModif) {
+            const inputName = document.getElementById('swal-input-name-modal');
+            if (inputName) {
                 inputName.removeAttribute('disabled');
                 inputName.focus();
-                btnModif.classList.add('d-none');
             }
         }
 
@@ -509,6 +578,9 @@
             container.innerHTML = '';
 
             matchesData.forEach(match => {
+                const result = matchResults[match.id] || { homeScore: 0, awayScore: 0 };
+                const resultText = `${result.homeScore} - ${result.awayScore}`;
+                
                 const card = document.createElement('div');
                 card.className = 'match-card';
                 card.innerHTML = `
@@ -520,6 +592,7 @@
                         <div class="team-box">
                             <img src="${match.homeFlagUrl}" alt="${match.homeTeam}" class="flag-img">
                             <span class="team-name">${match.homeTeam}</span>
+                            <span class="match-result">${result.homeScore}</span>
                         </div>
                         <div class="vs-box">
                             <span class="badge-vs">VS</span>
@@ -528,6 +601,7 @@
                         <div class="team-box">
                             <img src="${match.awayFlagUrl}" alt="${match.awayTeam}" class="flag-img">
                             <span class="team-name">${match.awayTeam}</span>
+                            <span class="match-result">${result.awayScore}</span>
                         </div>
                     </div>
                     <div class="match-actions d-flex gap-2">
@@ -550,7 +624,7 @@
                 if (!timerElement) return;
                 const distance = new Date(match.timestamp).getTime() - now;
                 if (distance < 0) {
-                    timerElement.innerHTML = "<span class='text-secondary'>En cours / Terminé</span>";
+                    timerElement.innerHTML = "<span class='text-secondary'>Match terminé</span>";
                 } else {
                     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
                     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
@@ -586,11 +660,9 @@
                 return;
             }
 
-            const idsA_Supprimer = Array.from(checkedBoxes).map(chk => chk.value);
-
             const confirmation = await Swal.fire({
                 title: 'Confirmer la suppression ?',
-                text: `Vous allez supprimer ${idsA_Supprimer.length} message(s) sélectionné(s).`,
+                text: `Vous allez supprimer ${checkedBoxes.length} message(s) sélectionné(s).`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#d33',
@@ -602,9 +674,10 @@
 
             if (!confirmation.isConfirmed) { return; }
 
-            Swal.fire({ title: 'Suppression en cours...', didOpen: () => { Swal.showLoading(); } });
+            const loadingToast = Swal.fire({ title: 'Suppression en cours...', didOpen: () => { Swal.showLoading(); }, allowOutsideClick: false });
 
             try {
+                const idsA_Supprimer = Array.from(checkedBoxes).map(chk => chk.value);
                 const urlParams = new URLSearchParams();
                 urlParams.append("action", "delete");
                 urlParams.append("commentId", idsA_Supprimer.join(",")); 
@@ -614,23 +687,98 @@
                     body: urlParams
                 });
 
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 800));
+                loadingToast.close();
                 openCommentsModal(matchId); 
             } catch (err) {
+                loadingToast.close();
                 Swal.fire({ icon: 'error', title: 'Erreur', text: 'Action impossible.', customClass: { popup: 'swal2-popup-dark' } });
             }
         }
 
-        async function openCommentsModal(matchId) {
-            selectedParentId = "root"; 
-            Swal.fire({ title: 'Chargement...', didOpen: () => { Swal.showLoading(); } });
+        function afficherChargementModale() {
+            Swal.fire({
+                title: '<div class="loading-text"><div class="loading-spinner"></div>Chargement de la discussion...</div>',
+                showConfirmButton: false,
+                allowOutsideClick: false,
+                customClass: { popup: 'swal2-popup-dark' }
+            });
+        }
 
+        async function openCommentsModal(matchId) {
+            currentMatchId = matchId;
+            selectedParentId = "root";
+            
+            afficherChargementModale();
+            
             let treeHtml = '<p class="text-muted small my-5 text-center">Aucun message. Laissez un mot de soutien !</p>';
             let bulkActionBarHtml = '';
 
-            if (estAdmin) {
+            let matchComments = [];
+            try {
+                if(GOOGLE_SHEET_SCRIPT_URL !== "") {
+                    const response = await fetch(`${GOOGLE_SHEET_SCRIPT_URL}?_cb=${Date.now()}`);
+                    const list = await response.json();
+                    matchComments = list.filter(c => c.matchId == matchId);
+                }
+            } catch (e) {
+                console.warn("Erreur chargement commentaires", e);
+            }
+
+            if(matchComments.length > 0) {
+                treeHtml = "";
+                const roots = matchComments.filter(c => c.parentId === "root");
+                const replies = matchComments.filter(c => c.parentId !== "root");
+
+                roots.forEach(root => {
+                    const dateRacineFormatee = formaterDateISO(root.date);
+                    const safeRootNom = escapeHtml(root.nom).replace(/'/g, "\\'");
+                    const chkBoxAdminRoot = estAdmin ? `<input type="checkbox" class="admin-checkbox comment-select-chk me-2 mt-1" value="${root.commentId}">` : '';
+
+                    treeHtml += `
+                        <div class="root-comment text-start">
+                            <div class="d-flex align-items-start">
+                                ${chkBoxAdminRoot}
+                                <div class="flex-grow-1">
+                                    <div class="d-flex justify-content-between" style="font-size:0.75rem;">
+                                        <strong class="text-success small">${escapeHtml(root.nom)}</strong>
+                                        <span class="text-muted" style="font-size:0.7rem;">${dateRacineFormatee}</span>
+                                    </div>
+                                    <div class="text-white-50 small mt-1">${escapeHtml(root.commentaire)}</div>
+                                    <div class="text-end mt-1">
+                                        <button class="btn-reply-link" onclick="setReplyTarget('${root.commentId}', '${safeRootNom}')">Répondre</button>
+                                    </div>
+                                </div>
+                            </div>
+                    `;
+                    
+                    const subReplies = replies.filter(r => r.parentId === root.commentId);
+                    subReplies.forEach(reply => {
+                        const dateReponseFormatee = formaterDateISO(reply.date);
+                        const chkBoxAdminReply = estAdmin ? `<input type="checkbox" class="admin-checkbox comment-select-chk me-2 mt-1" value="${reply.commentId}">` : '';
+
+                        treeHtml += `
+                            <div class="reply-comment">
+                                <div class="d-flex align-items-start">
+                                    ${chkBoxAdminReply}
+                                    <div class="flex-grow-1">
+                                        <div class="d-flex justify-content-between" style="font-size:0.72rem;">
+                                            <strong style="color: #00ff87;">${escapeHtml(reply.nom)}</strong>
+                                            <span class="text-muted" style="font-size:0.65rem;">${dateReponseFormatee}</span>
+                                        </div>
+                                        <div class="text-white-50 small mt-1">${escapeHtml(reply.commentaire)}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    treeHtml += `</div>`; 
+                });
+            }
+
+            if (estAdmin && matchComments.length > 0) {
                 bulkActionBarHtml = `
-                    <div class="admin-bulk-bar d-flex align-items-center justify-content-between text-start flex-shrink-0">
+                    <div class="admin-bulk-bar d-flex align-items-center justify-content-between text-start flex-shrink-0" style="margin: 10px 15px 0 15px;">
                         <div class="d-flex align-items-center gap-2">
                             <input type="checkbox" id="chk-all-admin" class="admin-checkbox" onchange="toggleSelectAllAdmin(this)">
                             <label for="chk-all-admin" class="small text-white-50 m-0" style="cursor:pointer">Tout cocher</label>
@@ -641,165 +789,122 @@
                     </div>
                 `;
             }
-            
-            try {
-                if(GOOGLE_SHEET_SCRIPT_URL !== "") {
-                    const response = await fetch(`${GOOGLE_SHEET_SCRIPT_URL}?_cb=${Date.now()}`);
-                    const list = await response.json();
-                    const matchComments = list.filter(c => c.matchId == matchId);
-                    
-                    if(matchComments.length > 0) {
-                        treeHtml = "";
-                        const roots = matchComments.filter(c => c.parentId === "root");
-                        const replies = matchComments.filter(c => c.parentId !== "root");
-
-                        roots.forEach(root => {
-                            const dateRacineFormatee = formaterDateISO(root.date);
-                            const safeRootNom = escapeHtml(root.nom).replace(/'/g, "\\'");
-                            const chkBoxAdminRoot = estAdmin ? `<input type="checkbox" class="admin-checkbox comment-select-chk me-2 mt-1" value="${root.commentId}">` : '';
-
-                            treeHtml += `
-                                <div class="root-comment text-start">
-                                    <div class="d-flex align-items-start">
-                                        ${chkBoxAdminRoot}
-                                        <div class="flex-grow-1">
-                                            <div class="d-flex justify-content-between" style="font-size:0.75rem;">
-                                                <strong class="text-success small">${escapeHtml(root.nom)}</strong>
-                                                <span class="text-muted" style="font-size:0.7rem;">${dateRacineFormatee}</span>
-                                            </div>
-                                            <div class="text-white-50 small mt-1">${escapeHtml(root.commentaire)}</div>
-                                            <div class="text-end mt-1">
-                                                <button class="btn-reply-link" onclick="setReplyTarget('${root.commentId}', '${safeRootNom}')">Répondre</button>
-                                            </div>
-                                        </div>
-                                    </div>
-                            `;
-                            
-                            const subReplies = replies.filter(r => r.parentId === root.commentId);
-                            subReplies.forEach(reply => {
-                                const dateReponseFormatee = formaterDateISO(reply.date);
-                                const chkBoxAdminReply = estAdmin ? `<input type="checkbox" class="admin-checkbox comment-select-chk me-2 mt-1" value="${reply.commentId}">` : '';
-
-                                treeHtml += `
-                                    <div class="reply-comment">
-                                        <div class="d-flex align-items-start">
-                                            ${chkBoxAdminReply}
-                                            <div class="flex-grow-1">
-                                                <div class="d-flex justify-content-between" style="font-size:0.72rem;">
-                                                    <strong style="color: #00ff87;">${escapeHtml(reply.nom)}</strong>
-                                                    <span class="text-muted" style="font-size:0.65rem;">${dateReponseFormatee}</span>
-                                                </div>
-                                                <div class="text-white-50 small mt-1">${escapeHtml(reply.commentaire)}</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `;
-                            });
-                            treeHtml += `</div>`; 
-                        });
-                    }
-                }
-            } catch (e) {
-                treeHtml = '<p class="text-danger small my-5 text-center">Erreur de liaison ou aucun commentaire trouvé.</p>';
-            }
 
             const pseudoSauvegarde = localStorage.getItem('supporter_pseudo') || '';
             const estVerrouille = pseudoSauvegarde !== '' ? 'disabled' : '';
             const classeBoutonModif = pseudoSauvegarde !== '' ? '' : 'd-none';
 
-            // Injection et structure stricte Flexbox pour figer les formulaires
+            Swal.close();
+
             Swal.fire({
-                title: `<div class="text-center w-100 flex-shrink-0 pt-2"><span class="fs-5 text-white fw-bold"><i class="fa-regular fa-comments me-2 text-warning"></i>Espace de Discussion</span></div>`,
-                grow: 'fullscreen', 
+                title: '',
+                showConfirmButton: false,
+                showCancelButton: false,
+                customClass: { popup: 'swal2-popup-fullscreen-maroc' },
                 html: `
-                    ${bulkActionBarHtml}
-                    
-                    <div class="comment-container-fullscreen">
-                        ${treeHtml}
-                    </div>
-                    
-                    <div class="discussion-footer-form text-start flex-shrink-0">
-                        <div id="reply-indicator" class="badge bg-secondary mb-2 d-none" style="font-size:0.75rem;">
-                            En réponse à : <span id="reply-target-name"></span> 
-                            <i class="fa-solid fa-xmark ms-2" style="cursor:pointer" onclick="resetReplyTarget()"></i>
+                    <div style="height:100%; display:flex; flex-direction:column;">
+                        <div class="discussion-header-fixed">
+                            <h3><i class="fa-regular fa-comments me-2 text-warning"></i>Espace de Discussion</h3>
+                            <p>Match ${matchesData.find(m => m.id === matchId)?.homeTeam} vs ${matchesData.find(m => m.id === matchId)?.awayTeam}</p>
                         </div>
-                        
-                        <div class="d-flex justify-content-between align-items-center mb-1">
-                            <label for="swal-input-name" class="small text-white-50">Votre Pseudo :</label>
-                            <button id="btn-modifier-pseudo" class="btn btn-link p-0 text-info small ${classeBoutonModif}" style="font-size:0.75rem; text-decoration:none;" onclick="debloquerPseudo()">
-                                <i class="fa-solid fa-pen-to-square me-1"></i>Changer
-                            </button>
+                        ${bulkActionBarHtml}
+                        <div class="comment-container-fullscreen" id="comment-scroll-area">
+                            ${treeHtml}
                         </div>
-                        <input id="swal-input-name" class="form-control form-control-sm mb-2" placeholder="Ex: Ahmed" value="${pseudoSauvegarde}" ${estVerrouille}>
-                        
-                        <label for="swal-input-msg" class="small mb-1 d-block text-white-50">Votre message :</label>
-                        <textarea id="swal-input-msg" class="form-control form-control-sm" rows="2" placeholder="Votre texte ici..."></textarea>
+                        <div class="discussion-footer-fixed">
+                            <div id="reply-indicator-modal" class="badge bg-secondary mb-2 d-none" style="font-size:0.75rem;">
+                                En réponse à : <span id="reply-target-name-modal"></span> 
+                                <i class="fa-solid fa-xmark ms-2" style="cursor:pointer" onclick="resetReplyTargetModal()"></i>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label for="swal-input-name-modal" class="small text-white-50">Votre Pseudo :</label>
+                                <button id="btn-modifier-pseudo-modal" class="btn btn-link p-0 text-info small ${classeBoutonModif}" style="font-size:0.75rem; text-decoration:none;" onclick="debloquerPseudo()">
+                                    <i class="fa-solid fa-pen-to-square me-1"></i>Changer
+                                </button>
+                            </div>
+                            <input id="swal-input-name-modal" class="form-control form-control-sm mb-2" placeholder="Ex: Ahmed" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}" ${estVerrouille}>
+                            <label for="swal-input-msg-modal" class="small mb-1 d-block text-white-50">Votre message :</label>
+                            <textarea id="swal-input-msg-modal" class="form-control form-control-sm" rows="2" placeholder="Votre texte ici..."></textarea>
+                            <div class="d-flex gap-2 mt-3">
+                                <button id="close-discussion-btn" class="btn btn-secondary flex-grow-1" style="background:#6c757d; border:none;">Fermer</button>
+                                <button id="send-discussion-btn" class="btn btn-success flex-grow-1" style="background:#006233; border:none;"><i class="fa-regular fa-paper-plane me-1"></i> Envoyer</button>
+                            </div>
+                        </div>
                     </div>
                 `,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fa-regular fa-paper-plane me-1"></i> Envoyer',
-                confirmButtonColor: '#006233',
-                cancelButtonText: 'Fermer',
-                customClass: { popup: 'swal2-popup-fullscreen-maroc' }, 
-                preConfirm: async () => {
-                    const nom = document.getElementById('swal-input-name').value.trim();
-                    const commentaire = document.getElementById('swal-input-msg').value.trim();
+                didOpen: () => {
+                    const closeBtn = document.getElementById('close-discussion-btn');
+                    const sendBtn = document.getElementById('send-discussion-btn');
                     
-                    if (!nom || !whitespaceCheck(commentaire)) {
-                        Swal.showValidationMessage("Complétez tous les champs !");
-                        return false;
+                    if (closeBtn) {
+                        closeBtn.onclick = () => Swal.close();
                     }
-
-                    localStorage.setItem('supporter_pseudo', nom);
-
-                    const commentId = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
                     
-                    const aujourdhui = new Date();
-                    const jj = String(aujourdhui.getDate()).padStart(2, '0');
-                    const mm = String(aujourdhui.getMonth() + 1).padStart(2, '0');
-                    const aaaa = aujourdhui.getFullYear();
-                    const dateFormatee = `${jj}/${mm}/${aaaa}`;
+                    if (sendBtn) {
+                        sendBtn.onclick = async () => {
+                            const nom = document.getElementById('swal-input-name-modal').value.trim();
+                            const commentaire = document.getElementById('swal-input-msg-modal').value.trim();
+                            
+                            if (!nom || !whitespaceCheck(commentaire)) {
+                                Swal.fire({ icon: 'error', title: 'Champs vides', text: 'Veuillez remplir tous les champs.', customClass: { popup: 'swal2-popup-dark' }, timer: 1500, showConfirmButton: false });
+                                return;
+                            }
 
-                    const urlParams = new URLSearchParams();
-                    urlParams.append("action", "add");
-                    urlParams.append("matchId", matchId);
-                    urlParams.append("commentId", commentId);
-                    urlParams.append("parentId", selectedParentId);
-                    urlParams.append("nom", nom);
-                    urlParams.append("commentaire", commentaire);
-                    urlParams.append("date", dateFormatee);
+                            localStorage.setItem('supporter_pseudo', nom);
 
-                    try {
-                        await fetch(GOOGLE_SHEET_SCRIPT_URL, {
-                            method: "POST",
-                            body: urlParams
-                        });
-                        
-                        await new Promise(resolve => setTimeout(resolve, 800));
-                        return true;
-                    } catch (err) {
-                        Swal.showValidationMessage("Erreur d'enregistrement.");
-                        return false;
+                            const loadingSend = Swal.fire({ title: '<div class="loading-text"><div class="loading-spinner"></div>Envoi du message...</div>', showConfirmButton: false, allowOutsideClick: false, customClass: { popup: 'swal2-popup-dark' } });
+
+                            const commentId = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                            const aujourdhui = new Date();
+                            const jj = String(aujourdhui.getDate()).padStart(2, '0');
+                            const mm = String(aujourdhui.getMonth() + 1).padStart(2, '0');
+                            const aaaa = aujourdhui.getFullYear();
+                            const dateFormatee = `${jj}/${mm}/${aaaa}`;
+
+                            const urlParams = new URLSearchParams();
+                            urlParams.append("action", "add");
+                            urlParams.append("matchId", matchId);
+                            urlParams.append("commentId", commentId);
+                            urlParams.append("parentId", selectedParentId);
+                            urlParams.append("nom", nom);
+                            urlParams.append("commentaire", commentaire);
+                            urlParams.append("date", dateFormatee);
+
+                            try {
+                                await fetch(GOOGLE_SHEET_SCRIPT_URL, {
+                                    method: "POST",
+                                    body: urlParams
+                                });
+                                loadingSend.close();
+                                Swal.fire({ icon: 'success', title: 'Message envoyé!', timer: 1000, showConfirmButton: false, customClass: { popup: 'swal2-popup-dark' } });
+                                setTimeout(() => openCommentsModal(matchId), 1000);
+                            } catch (err) {
+                                loadingSend.close();
+                                Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible d\'envoyer.', customClass: { popup: 'swal2-popup-dark' } });
+                            }
+                        };
                     }
                 }
-            }).then((res) => { if (res.isConfirmed) { openCommentsModal(matchId); } });
+            });
         }
 
         function setReplyTarget(id, name) {
             selectedParentId = id;
-            const ind = document.getElementById('reply-indicator');
-            const tgt = document.getElementById('reply-target-name');
+            const ind = document.getElementById('reply-indicator-modal');
+            const tgt = document.getElementById('reply-target-name-modal');
             if(ind && tgt) {
                 tgt.innerText = name;
                 ind.classList.remove('d-none');
-                // Petit effet de focus automatique sur la zone de saisie textuelle
-                document.getElementById('swal-input-msg').focus();
+                setTimeout(() => {
+                    const msgInput = document.getElementById('swal-input-msg-modal');
+                    if(msgInput) msgInput.focus();
+                }, 100);
             }
         }
 
-        function resetReplyTarget() {
+        function resetReplyTargetModal() {
             selectedParentId = "root";
-            const ind = document.getElementById('reply-indicator');
+            const ind = document.getElementById('reply-indicator-modal');
             if(ind) ind.classList.add('d-none');
         }
 
