@@ -229,7 +229,7 @@
             padding: 20px;
         }
 
-        /* Styles pour les messages de discussion avec préservation des sauts de ligne et alignement justifié */
+        /* Styles pour les messages de discussion */
         .comment-message {
             white-space: pre-wrap;
             word-wrap: break-word;
@@ -240,7 +240,7 @@
         }
 
         /* ---------------------------------------------------- */
-        /* STRUCTURE DE L'ESPACE DISCUSSION PLEIN ÉCRAN FIGÉ    */
+        /* MODALE DISCUSSION PLEIN ÉCRAN */
         /* ---------------------------------------------------- */
         
         .swal2-popup-fullscreen-maroc {
@@ -265,7 +265,7 @@
             height: 100% !important;
         }
 
-        /* Header fixe de la modale */
+        /* Header fixe de la modale discussion */
         .discussion-header-fixed {
             background: linear-gradient(135deg, #8b0000 0%, #111827 100%);
             padding: 15px 20px;
@@ -288,19 +288,18 @@
             color: #00ff87;
         }
 
-        /* Zone de la liste des messages : Seule zone autorisée à scroller */
+        /* Zone de la liste des messages */
         .comment-container-fullscreen {
             flex: 1;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
             background: rgba(0, 0, 0, 0.5) !important;
             backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
             padding: 15px;
             margin: 0;
         }
 
-        /* Footer fixe de la modale avec le bouton d'ajout seulement */
+        /* Footer fixe de la modale discussion */
         .discussion-footer-fixed {
             background: rgba(11, 15, 25, 0.95);
             backdrop-filter: blur(10px);
@@ -313,16 +312,120 @@
             background: linear-gradient(135deg, #006233, #008844);
             color: white;
             border: none;
-            padding: 12px;
+            padding: 14px;
             border-radius: 12px;
             font-weight: bold;
             font-size: 1rem;
             width: 100%;
-            transition: transform 0.2s, box-shadow 0.2s;
+            transition: transform 0.2s;
         }
 
         .btn-add-comment:active {
             transform: scale(0.98);
+        }
+
+        /* ---------------------------------------------------- */
+        /* MODALE NOUVEAU MESSAGE - PLEIN ÉCRAN AUSSI */
+        /* ---------------------------------------------------- */
+        
+        .swal2-popup-fullscreen-message {
+            background: linear-gradient(135deg, #0b0f19 0%, #052e16 100%) !important;
+            color: #f8f9fa !important;
+            padding: 0 !important;
+            height: 100vh !important;
+            width: 100vw !important;
+            max-width: none !important;
+            border-radius: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+        }
+
+        .swal2-popup-fullscreen-message .swal2-html-container {
+            margin: 0 !important;
+            padding: 0 !important;
+            flex: 1 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            overflow: hidden !important;
+            height: 100% !important;
+        }
+
+        /* Header fixe de la modale message */
+        .message-header-fixed {
+            background: linear-gradient(135deg, #8b0000 0%, #111827 100%);
+            padding: 15px 20px;
+            border-bottom: 3px solid #00ff87;
+            flex-shrink: 0;
+            text-align: center;
+        }
+
+        .message-header-fixed h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .message-header-fixed p {
+            margin: 5px 0 0;
+            font-size: 0.8rem;
+            color: #00ff87;
+        }
+
+        /* Zone de formulaire scrollable */
+        .message-form-scrollable {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 20px;
+        }
+
+        /* Footer fixe avec les boutons */
+        .message-footer-fixed {
+            background: rgba(11, 15, 25, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 2px solid rgba(0, 255, 135, 0.3);
+            padding: 15px 20px;
+            flex-shrink: 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .message-footer-fixed .btn {
+            flex: 1;
+            padding: 12px;
+            font-weight: bold;
+            font-size: 1rem;
+            border-radius: 12px;
+        }
+
+        .reply-badge-full {
+            background: #006233;
+            padding: 10px 15px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* Styles pour les champs de formulaire */
+        .message-form-scrollable .form-control,
+        .message-form-scrollable .form-control-lg {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15) !important;
+            color: #ffffff !important;
+            font-size: 16px !important;
+            padding: 12px !important;
+        }
+
+        .message-form-scrollable .form-control:focus {
+            border-color: #00ff87 !important;
+            box-shadow: 0 0 0 0.25rem rgba(0, 255, 135, 0.25) !important;
+        }
+
+        .message-form-scrollable label {
+            color: #00ff87;
+            font-weight: 500;
+            margin-bottom: 8px;
         }
 
         .root-comment {
@@ -350,11 +453,6 @@
             padding: 0;
             text-decoration: underline;
             cursor: pointer;
-            transition: opacity 0.2s;
-        }
-
-        .btn-reply-link:hover {
-            opacity: 0.8;
         }
 
         .admin-checkbox {
@@ -384,43 +482,6 @@
             max-width: 500px !important;
         }
 
-        /* Modale d'ajout de message - Positionnée pour être visible au-dessus du clavier */
-        .swal2-popup-message-form {
-            background: linear-gradient(135deg, #1a1f2e, #0b0f19) !important;
-            color: #f8f9fa !important;
-            border-radius: 24px !important;
-            width: 92% !important;
-            max-width: 450px !important;
-            padding: 0 !important;
-            overflow: hidden !important;
-            position: relative !important;
-        }
-
-        .message-form-container {
-            max-height: 80vh;
-            overflow-y: auto;
-            padding: 20px;
-            -webkit-overflow-scrolling: touch;
-        }
-
-        /* Style pour le champ textarea */
-        .message-form-container textarea {
-            min-height: 120px;
-            font-size: 16px !important;
-        }
-
-        .reply-badge {
-            background: #006233;
-            padding: 8px 12px;
-            border-radius: 12px;
-            margin-bottom: 15px;
-        }
-
-        /* Style spécifique pour les inputs sur mobile */
-        input, textarea {
-            font-size: 16px !important;
-        }
-
         .app-footer {
             background-color: #0b0f19;
             border-top: 1px solid rgba(255, 255, 255, 0.08);
@@ -435,23 +496,22 @@
             color: #a0aec0;
         }
 
-        /* Amélioration du scroll pour une meilleure expérience */
-        .comment-container-fullscreen::-webkit-scrollbar {
+        /* Scrollbar personnalisée */
+        .comment-container-fullscreen::-webkit-scrollbar,
+        .message-form-scrollable::-webkit-scrollbar {
             width: 8px;
         }
 
-        .comment-container-fullscreen::-webkit-scrollbar-track {
+        .comment-container-fullscreen::-webkit-scrollbar-track,
+        .message-form-scrollable::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3);
             border-radius: 4px;
         }
 
-        .comment-container-fullscreen::-webkit-scrollbar-thumb {
+        .comment-container-fullscreen::-webkit-scrollbar-thumb,
+        .message-form-scrollable::-webkit-scrollbar-thumb {
             background: #00ff87;
             border-radius: 4px;
-        }
-
-        .comment-container-fullscreen::-webkit-scrollbar-thumb:hover {
-            background: #00cc6a;
         }
     </style>
 </head>
@@ -499,7 +559,6 @@
     <script>
         const GOOGLE_SHEET_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9utojYkIxj1cI7Zvt3O89BoMGQy5zYe8wDVe_-Ph1lf6oOLciqpH0qwei1y9VuAtp/exec";
 
-        // RÉSULTATS DES MATCHS - MODIFIABLES DIRECTEMENT ICI
         const matchResults = {
             1: { homeScore: 0, awayScore: 0 },
             2: { homeScore: 0, awayScore: 0 },
@@ -768,137 +827,143 @@
             return escapeHtml(message).replace(/\n/g, '<br>').replace(/\r/g, '');
         }
 
-        // Fonction améliorée pour la modale de saisie - avec gestion optimale du clavier
+        // Modale NOUVEAU MESSAGE en PLEIN ÉCRAN
         async function openMessageFormModal(matchId, parentId, parentName) {
             const pseudoSauvegarde = localStorage.getItem('supporter_pseudo') || '';
             const isReply = parentId !== "root";
             
+            // Stocker temporairement les valeurs pour validation
+            let pseudoValue = pseudoSauvegarde;
+            let messageValue = '';
+            
             const modalHtml = `
-                <div class="message-form-container" id="messageFormContainer">
-                    ${isReply ? `<div class="reply-badge text-center">
-                        <i class="fa-solid fa-reply me-1"></i> En réponse à : <strong>${escapeHtml(parentName)}</strong>
-                    </div>` : ''}
-                    
-                    <div class="mb-3">
-                        <label class="small mb-1 d-block text-white-50">Votre pseudo :</label>
-                        <input type="text" id="msg-pseudo" class="form-control bg-dark text-white border-secondary" 
-                               placeholder="Votre pseudo" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}" 
-                               style="font-size: 16px; padding: 12px;">
+                <div style="height:100%; display:flex; flex-direction:column;">
+                    <div class="message-header-fixed">
+                        <h3><i class="fa-regular fa-pen-to-square me-2 text-warning"></i>Nouveau message</h3>
+                        <p>${currentMatchData ? currentMatchData.homeTeam + ' vs ' + currentMatchData.awayTeam : 'Supporters Maroc'}</p>
                     </div>
                     
-                    <div class="mb-3">
-                        <label class="small mb-1 d-block text-white-50">Votre message :</label>
-                        <textarea id="msg-content" class="form-control bg-dark text-white border-secondary" 
-                                  rows="5" placeholder="Écrivez votre message ici...&#10;Appuyez sur Entrée pour passer à la ligne"
-                                  style="font-size: 16px; resize: vertical; padding: 12px;"></textarea>
+                    <div class="message-form-scrollable" id="messageScrollArea">
+                        ${isReply ? `<div class="reply-badge-full">
+                            <i class="fa-solid fa-reply me-1"></i> En réponse à : <strong>${escapeHtml(parentName)}</strong>
+                        </div>` : ''}
+                        
+                        <div class="mb-4">
+                            <label class="small mb-2 d-block"><i class="fa-solid fa-user me-1"></i> Votre pseudo</label>
+                            <input type="text" id="msg-pseudo" class="form-control form-control-lg" 
+                                   placeholder="Votre pseudo" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}">
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="small mb-2 d-block"><i class="fa-regular fa-message me-1"></i> Votre message</label>
+                            <textarea id="msg-content" class="form-control" 
+                                      rows="6" placeholder="Écrivez votre message ici...&#10;Appuyez sur Entrée pour passer à la ligne"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="message-footer-fixed">
+                        <button id="cancel-message-btn" class="btn btn-secondary">Annuler</button>
+                        <button id="send-message-btn" class="btn btn-success">Envoyer <i class="fa-regular fa-paper-plane ms-1"></i></button>
                     </div>
                 </div>
             `;
 
             const result = await Swal.fire({
-                title: '<i class="fa-regular fa-pen-to-square me-2 text-success"></i> Nouveau message',
+                title: '',
                 html: modalHtml,
-                showCancelButton: true,
-                confirmButtonText: '<i class="fa-regular fa-paper-plane me-1"></i> Envoyer',
-                cancelButtonText: 'Annuler',
-                confirmButtonColor: '#006233',
-                cancelButtonColor: '#6c757d',
-                customClass: { popup: 'swal2-popup-message-form' },
-                willOpen: () => {
-                    // Désactiver le scroll automatique de Swal
-                    setTimeout(() => {
-                        const textarea = document.getElementById('msg-content');
-                        const pseudoInput = document.getElementById('msg-pseudo');
-                        
-                        if (textarea) {
-                            // S'assurer que le textarea a le focus et ajuster la position
-                            textarea.focus();
-                            
-                            // Redimensionnement automatique
-                            const autoResize = (ta) => {
-                                ta.style.height = 'auto';
-                                ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
-                            };
-                            
-                            textarea.addEventListener('input', function() {
-                                autoResize(this);
-                            });
-                            autoResize(textarea);
-                        }
-                        
-                        // Pour les très petits écrans, s'assurer que le formulaire est visible
-                        const container = document.querySelector('.message-form-container');
-                        if (container && window.innerHeight < 600) {
-                            container.style.maxHeight = '70vh';
-                        }
-                    }, 100);
-                },
+                showConfirmButton: false,
+                showCancelButton: false,
+                customClass: { popup: 'swal2-popup-fullscreen-message' },
                 didOpen: () => {
-                    // Écouter le clavier pour améliorer l'expérience
-                    const textarea = document.getElementById('msg-content');
-                    if (textarea) {
-                        // Éviter que le textarea ne soit caché
-                        textarea.addEventListener('focus', () => {
-                            setTimeout(() => {
-                                textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                            }, 300);
-                        });
+                    const pseudoInput = document.getElementById('msg-pseudo');
+                    const messageTextarea = document.getElementById('msg-content');
+                    const cancelBtn = document.getElementById('cancel-message-btn');
+                    const sendBtn = document.getElementById('send-message-btn');
+                    const scrollArea = document.getElementById('messageScrollArea');
+                    
+                    if (messageTextarea) {
+                        // Focus sur le textarea après ouverture
+                        setTimeout(() => {
+                            messageTextarea.focus();
+                            // Scroll pour amener le textarea en haut de la zone scrollable
+                            if (scrollArea) {
+                                messageTextarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }, 300);
+                        
+                        // Auto-resize
+                        const autoResize = (ta) => {
+                            ta.style.height = 'auto';
+                            ta.style.height = Math.min(ta.scrollHeight, 250) + 'px';
+                        };
+                        messageTextarea.addEventListener('input', function() { autoResize(this); });
+                        autoResize(messageTextarea);
                     }
-                },
-                preConfirm: () => {
-                    const pseudo = document.getElementById('msg-pseudo').value.trim();
-                    const message = document.getElementById('msg-content').value;
-                    if (!pseudo) {
-                        Swal.showValidationMessage('Veuillez entrer votre pseudo');
-                        return false;
+                    
+                    if (cancelBtn) {
+                        cancelBtn.onclick = () => Swal.close();
                     }
-                    if (!message.trim()) {
-                        Swal.showValidationMessage('Veuillez écrire un message');
-                        return false;
+                    
+                    if (sendBtn) {
+                        sendBtn.onclick = async () => {
+                            const pseudo = document.getElementById('msg-pseudo').value.trim();
+                            const message = document.getElementById('msg-content').value;
+                            
+                            if (!pseudo) {
+                                Swal.fire({ icon: 'error', title: 'Champ vide', text: 'Veuillez entrer votre pseudo', customClass: { popup: 'swal2-popup-dark' }, timer: 1500, showConfirmButton: false });
+                                document.getElementById('msg-pseudo').focus();
+                                return;
+                            }
+                            if (!message.trim()) {
+                                Swal.fire({ icon: 'error', title: 'Champ vide', text: 'Veuillez écrire un message', customClass: { popup: 'swal2-popup-dark' }, timer: 1500, showConfirmButton: false });
+                                document.getElementById('msg-content').focus();
+                                return;
+                            }
+                            
+                            // Fermer la modale et envoyer
+                            Swal.close();
+                            
+                            localStorage.setItem('supporter_pseudo', pseudo);
+                            
+                            const loadingSend = Swal.fire({ 
+                                title: '<div class="loading-text"><div class="loading-spinner"></div>Envoi du message...</div>', 
+                                showConfirmButton: false, 
+                                allowOutsideClick: false, 
+                                customClass: { popup: 'swal2-popup-dark' } 
+                            });
+                            
+                            const commentId = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
+                            const aujourdhui = new Date();
+                            const jj = String(aujourdhui.getDate()).padStart(2, '0');
+                            const mm = String(aujourdhui.getMonth() + 1).padStart(2, '0');
+                            const aaaa = aujourdhui.getFullYear();
+                            const dateFormatee = `${jj}/${mm}/${aaaa}`;
+                            
+                            const urlParams = new URLSearchParams();
+                            urlParams.append("action", "add");
+                            urlParams.append("matchId", matchId);
+                            urlParams.append("commentId", commentId);
+                            urlParams.append("parentId", parentId);
+                            urlParams.append("nom", pseudo);
+                            urlParams.append("commentaire", message);
+                            urlParams.append("date", dateFormatee);
+                            
+                            try {
+                                await fetch(GOOGLE_SHEET_SCRIPT_URL, {
+                                    method: "POST",
+                                    body: urlParams
+                                });
+                                loadingSend.close();
+                                Swal.fire({ icon: 'success', title: 'Message envoyé!', timer: 1000, showConfirmButton: false, customClass: { popup: 'swal2-popup-dark' } });
+                                setTimeout(() => openCommentsModal(matchId), 1000);
+                            } catch (err) {
+                                loadingSend.close();
+                                Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible d\'envoyer.', customClass: { popup: 'swal2-popup-dark' } });
+                            }
+                        };
                     }
-                    return { pseudo, message };
                 }
             });
-
-            if (result.isConfirmed) {
-                localStorage.setItem('supporter_pseudo', result.value.pseudo);
-                
-                const loadingSend = Swal.fire({ 
-                    title: '<div class="loading-text"><div class="loading-spinner"></div>Envoi du message...</div>', 
-                    showConfirmButton: false, 
-                    allowOutsideClick: false, 
-                    customClass: { popup: 'swal2-popup-dark' } 
-                });
-
-                const commentId = "c_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
-                const aujourdhui = new Date();
-                const jj = String(aujourdhui.getDate()).padStart(2, '0');
-                const mm = String(aujourdhui.getMonth() + 1).padStart(2, '0');
-                const aaaa = aujourdhui.getFullYear();
-                const dateFormatee = `${jj}/${mm}/${aaaa}`;
-
-                const urlParams = new URLSearchParams();
-                urlParams.append("action", "add");
-                urlParams.append("matchId", matchId);
-                urlParams.append("commentId", commentId);
-                urlParams.append("parentId", parentId);
-                urlParams.append("nom", result.value.pseudo);
-                urlParams.append("commentaire", result.value.message);
-                urlParams.append("date", dateFormatee);
-
-                try {
-                    await fetch(GOOGLE_SHEET_SCRIPT_URL, {
-                        method: "POST",
-                        body: urlParams
-                    });
-                    loadingSend.close();
-                    Swal.fire({ icon: 'success', title: 'Message envoyé!', timer: 1000, showConfirmButton: false, customClass: { popup: 'swal2-popup-dark' } });
-                    setTimeout(() => openCommentsModal(matchId), 1000);
-                } catch (err) {
-                    loadingSend.close();
-                    Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible d\'envoyer.', customClass: { popup: 'swal2-popup-dark' } });
-                }
-            }
         }
 
         async function openCommentsModal(matchId) {
@@ -1027,14 +1092,11 @@
         function formaterDateISO(dateISO) {
             if (!dateISO) return "";
             if (typeof dateISO === 'string' && dateISO.includes('/')) return dateISO;
-            
             const dateObj = new Date(dateISO);
-            if (isNaN(dateObj.getTime())) return dateISO; 
-
+            if (isNaN(dateObj.getTime())) return dateISO;
             const jj = String(dateObj.getDate()).padStart(2, '0');
             const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
             const aaaa = dateObj.getFullYear();
-
             return `${jj}/${mm}/${aaaa}`;
         }
 
