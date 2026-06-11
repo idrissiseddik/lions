@@ -384,7 +384,7 @@
             max-width: 500px !important;
         }
 
-        /* Modale d'ajout de message dédiée - Version optimisée mobile */
+        /* Modale d'ajout de message - Positionnée pour être visible au-dessus du clavier */
         .swal2-popup-message-form {
             background: linear-gradient(135deg, #1a1f2e, #0b0f19) !important;
             color: #f8f9fa !important;
@@ -393,19 +393,20 @@
             max-width: 450px !important;
             padding: 0 !important;
             overflow: hidden !important;
+            position: relative !important;
         }
 
         .message-form-container {
-            max-height: 85vh;
+            max-height: 80vh;
             overflow-y: auto;
             padding: 20px;
             -webkit-overflow-scrolling: touch;
         }
 
-        /* Style pour le champ textarea avec focus visible */
+        /* Style pour le champ textarea */
         .message-form-container textarea {
             min-height: 120px;
-            max-height: 200px;
+            font-size: 16px !important;
         }
 
         .reply-badge {
@@ -413,6 +414,11 @@
             padding: 8px 12px;
             border-radius: 12px;
             margin-bottom: 15px;
+        }
+
+        /* Style spécifique pour les inputs sur mobile */
+        input, textarea {
+            font-size: 16px !important;
         }
 
         .app-footer {
@@ -762,30 +768,29 @@
             return escapeHtml(message).replace(/\n/g, '<br>').replace(/\r/g, '');
         }
 
-        // Ouvre la modale de saisie de message optimisée pour mobile
+        // Fonction améliorée pour la modale de saisie - avec gestion optimale du clavier
         async function openMessageFormModal(matchId, parentId, parentName) {
             const pseudoSauvegarde = localStorage.getItem('supporter_pseudo') || '';
             const isReply = parentId !== "root";
             
-            // Construction du HTML avec un conteneur scrollable
             const modalHtml = `
-                <div class="message-form-container">
+                <div class="message-form-container" id="messageFormContainer">
                     ${isReply ? `<div class="reply-badge text-center">
                         <i class="fa-solid fa-reply me-1"></i> En réponse à : <strong>${escapeHtml(parentName)}</strong>
                     </div>` : ''}
                     
                     <div class="mb-3">
                         <label class="small mb-1 d-block text-white-50">Votre pseudo :</label>
-                        <input type="text" id="msg-pseudo" class="form-control form-control-lg bg-dark text-white border-secondary" 
+                        <input type="text" id="msg-pseudo" class="form-control bg-dark text-white border-secondary" 
                                placeholder="Votre pseudo" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}" 
-                               style="font-size: 16px;">
+                               style="font-size: 16px; padding: 12px;">
                     </div>
                     
                     <div class="mb-3">
                         <label class="small mb-1 d-block text-white-50">Votre message :</label>
                         <textarea id="msg-content" class="form-control bg-dark text-white border-secondary" 
                                   rows="5" placeholder="Écrivez votre message ici...&#10;Appuyez sur Entrée pour passer à la ligne"
-                                  style="font-size: 16px; resize: vertical;"></textarea>
+                                  style="font-size: 16px; resize: vertical; padding: 12px;"></textarea>
                     </div>
                 </div>
             `;
@@ -799,33 +804,45 @@
                 confirmButtonColor: '#006233',
                 cancelButtonColor: '#6c757d',
                 customClass: { popup: 'swal2-popup-message-form' },
+                willOpen: () => {
+                    // Désactiver le scroll automatique de Swal
+                    setTimeout(() => {
+                        const textarea = document.getElementById('msg-content');
+                        const pseudoInput = document.getElementById('msg-pseudo');
+                        
+                        if (textarea) {
+                            // S'assurer que le textarea a le focus et ajuster la position
+                            textarea.focus();
+                            
+                            // Redimensionnement automatique
+                            const autoResize = (ta) => {
+                                ta.style.height = 'auto';
+                                ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
+                            };
+                            
+                            textarea.addEventListener('input', function() {
+                                autoResize(this);
+                            });
+                            autoResize(textarea);
+                        }
+                        
+                        // Pour les très petits écrans, s'assurer que le formulaire est visible
+                        const container = document.querySelector('.message-form-container');
+                        if (container && window.innerHeight < 600) {
+                            container.style.maxHeight = '70vh';
+                        }
+                    }, 100);
+                },
                 didOpen: () => {
-                    // Focus automatique sur le champ message pour une meilleure UX
+                    // Écouter le clavier pour améliorer l'expérience
                     const textarea = document.getElementById('msg-content');
                     if (textarea) {
-                        setTimeout(() => {
-                            textarea.focus();
-                            // Scroll pour amener le textarea en haut de la modale
-                            const container = document.querySelector('.message-form-container');
-                            if (container) {
-                                setTimeout(() => {
-                                    textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                                }, 100);
-                            }
-                        }, 200);
-                    }
-                    
-                    // Auto-resize du textarea
-                    const autoResize = (ta) => {
-                        ta.style.height = 'auto';
-                        ta.style.height = Math.min(ta.scrollHeight, 200) + 'px';
-                    };
-                    
-                    if (textarea) {
-                        textarea.addEventListener('input', function() {
-                            autoResize(this);
+                        // Éviter que le textarea ne soit caché
+                        textarea.addEventListener('focus', () => {
+                            setTimeout(() => {
+                                textarea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }, 300);
                         });
-                        autoResize(textarea);
                     }
                 },
                 preConfirm: () => {
