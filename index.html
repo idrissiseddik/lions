@@ -229,6 +229,16 @@
             padding: 20px;
         }
 
+        /* Styles pour les messages de discussion avec préservation des sauts de ligne et alignement justifié */
+        .comment-message {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            word-break: break-word;
+            text-align: justify;
+            line-height: 1.5;
+            font-size: 0.85rem;
+        }
+
         /* ---------------------------------------------------- */
         /* STRUCTURE DE L'ESPACE DISCUSSION PLEIN ÉCRAN FIGÉ    */
         /* ---------------------------------------------------- */
@@ -335,6 +345,11 @@
             padding: 0;
             text-decoration: underline;
             cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        .btn-reply-link:hover {
+            opacity: 0.8;
         }
 
         .admin-checkbox {
@@ -342,6 +357,8 @@
             height: 18px;
             accent-color: #ff3333;
             cursor: pointer;
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .admin-bulk-bar {
@@ -374,6 +391,25 @@
             text-align: center;
             font-size: 0.8rem;
             color: #a0aec0;
+        }
+
+        /* Amélioration du scroll pour une meilleure expérience */
+        .comment-container-fullscreen::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .comment-container-fullscreen::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .comment-container-fullscreen::-webkit-scrollbar-thumb {
+            background: #00ff87;
+            border-radius: 4px;
+        }
+
+        .comment-container-fullscreen::-webkit-scrollbar-thumb:hover {
+            background: #00cc6a;
         }
     </style>
 </head>
@@ -705,6 +741,13 @@
             });
         }
 
+        // Fonction pour formater le message avec préservation des sauts de ligne
+        function formatMessageWithLineBreaks(message) {
+            if (!message) return '';
+            // Remplacer les retours à la ligne par des <br> et préserver le formatage
+            return escapeHtml(message).replace(/\n/g, '<br>').replace(/\r/g, '');
+        }
+
         async function openCommentsModal(matchId) {
             currentMatchId = matchId;
             selectedParentId = "root";
@@ -734,6 +777,7 @@
                     const dateRacineFormatee = formaterDateISO(root.date);
                     const safeRootNom = escapeHtml(root.nom).replace(/'/g, "\\'");
                     const chkBoxAdminRoot = estAdmin ? `<input type="checkbox" class="admin-checkbox comment-select-chk me-2 mt-1" value="${root.commentId}">` : '';
+                    const formattedMessage = formatMessageWithLineBreaks(root.commentaire);
 
                     treeHtml += `
                         <div class="root-comment text-start">
@@ -744,7 +788,7 @@
                                         <strong class="text-success small">${escapeHtml(root.nom)}</strong>
                                         <span class="text-muted" style="font-size:0.7rem;">${dateRacineFormatee}</span>
                                     </div>
-                                    <div class="text-white-50 small mt-1">${escapeHtml(root.commentaire)}</div>
+                                    <div class="comment-message mt-1">${formattedMessage}</div>
                                     <div class="text-end mt-1">
                                         <button class="btn-reply-link" onclick="setReplyTarget('${root.commentId}', '${safeRootNom}')">Répondre</button>
                                     </div>
@@ -756,6 +800,7 @@
                     subReplies.forEach(reply => {
                         const dateReponseFormatee = formaterDateISO(reply.date);
                         const chkBoxAdminReply = estAdmin ? `<input type="checkbox" class="admin-checkbox comment-select-chk me-2 mt-1" value="${reply.commentId}">` : '';
+                        const formattedReplyMessage = formatMessageWithLineBreaks(reply.commentaire);
 
                         treeHtml += `
                             <div class="reply-comment">
@@ -766,7 +811,7 @@
                                             <strong style="color: #00ff87;">${escapeHtml(reply.nom)}</strong>
                                             <span class="text-muted" style="font-size:0.65rem;">${dateReponseFormatee}</span>
                                         </div>
-                                        <div class="text-white-50 small mt-1">${escapeHtml(reply.commentaire)}</div>
+                                        <div class="comment-message mt-1">${formattedReplyMessage}</div>
                                     </div>
                                 </div>
                             </div>
@@ -824,7 +869,7 @@
                             </div>
                             <input id="swal-input-name-modal" class="form-control form-control-sm mb-2" placeholder="Ex: Ahmed" value="${pseudoSauvegarde.replace(/"/g, '&quot;')}" ${estVerrouille}>
                             <label for="swal-input-msg-modal" class="small mb-1 d-block text-white-50">Votre message :</label>
-                            <textarea id="swal-input-msg-modal" class="form-control form-control-sm" rows="2" placeholder="Votre texte ici..."></textarea>
+                            <textarea id="swal-input-msg-modal" class="form-control form-control-sm" rows="3" placeholder="Votre texte ici...&#10;Appuyez sur Entrée pour aller à la ligne"></textarea>
                             <div class="d-flex gap-2 mt-3">
                                 <button id="close-discussion-btn" class="btn btn-secondary flex-grow-1" style="background:#6c757d; border:none;">Fermer</button>
                                 <button id="send-discussion-btn" class="btn btn-success flex-grow-1" style="background:#006233; border:none;"><i class="fa-regular fa-paper-plane me-1"></i> Envoyer</button>
@@ -843,7 +888,7 @@
                     if (sendBtn) {
                         sendBtn.onclick = async () => {
                             const nom = document.getElementById('swal-input-name-modal').value.trim();
-                            const commentaire = document.getElementById('swal-input-msg-modal').value.trim();
+                            const commentaire = document.getElementById('swal-input-msg-modal').value;
                             
                             if (!nom || !whitespaceCheck(commentaire)) {
                                 Swal.fire({ icon: 'error', title: 'Champs vides', text: 'Veuillez remplir tous les champs.', customClass: { popup: 'swal2-popup-dark' }, timer: 1500, showConfirmButton: false });
@@ -883,6 +928,14 @@
                                 Swal.fire({ icon: 'error', title: 'Erreur', text: 'Impossible d\'envoyer.', customClass: { popup: 'swal2-popup-dark' } });
                             }
                         };
+                    }
+                    
+                    // Scroll automatique vers le bas pour voir les derniers messages
+                    const scrollArea = document.getElementById('comment-scroll-area');
+                    if (scrollArea) {
+                        setTimeout(() => {
+                            scrollArea.scrollTop = scrollArea.scrollHeight;
+                        }, 100);
                     }
                 }
             });
